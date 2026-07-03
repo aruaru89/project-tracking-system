@@ -9,6 +9,8 @@ const slides = ["/slide1.png", "/slide2.png", "/slide3.png"];
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // ✅ เพิ่ม State สำหรับเปิด/ปิดเมนูมือถือ
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     // ตรวจสอบสถานะการ Login
@@ -21,7 +23,7 @@ export default function Home() {
     }, 4000);
     
     return () => clearInterval(timer);
-  }, []); // ✅ ปรับวงเล็บตรงนี้ให้เป็น Array ว่าง
+  }, []); 
 
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
@@ -36,7 +38,7 @@ export default function Home() {
       
       {/* HEADER */}
       <header className="sticky top-0 z-50 pt-5 pb-2 px-6 bg-[#FAFAFA]/90 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto bg-white border border-[#E5E7EB] rounded-3xl py-3 px-6 shadow-sm flex justify-between items-center gap-4">
+        <div className="max-w-7xl mx-auto relative bg-white border border-[#E5E7EB] rounded-3xl py-3 px-6 shadow-sm flex justify-between items-center gap-2 sm:gap-4">
           <div className="flex items-center gap-3 flex-shrink-0">
             {/* โลโก้แบบวงกลมสมบูรณ์ */}
             <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100 flex-shrink-0">
@@ -48,7 +50,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* เมนูตรงกลาง */}
+          {/* เมนูตรงกลาง (แสดงเฉพาะจอใหญ่) */}
           <div className="hidden lg:flex items-center gap-1">
             <Link href="/" className="bg-[#650014] text-white px-6 h-[44px] flex items-center justify-center rounded-full text-sm font-medium shadow-sm">
               หน้าหลัก
@@ -67,21 +69,53 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* ปุ่ม Login/Logout */}
-          <div className="flex items-center gap-3 flex-shrink-0">
+          {/* ปุ่ม Login/Logout และปุ่ม Hamburger */}
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             {isLoggedIn ? (
-              <button onClick={handleLogout} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 h-[44px] rounded-full text-sm font-medium transition-colors">ออกจากระบบ</button>
+              <button onClick={handleLogout} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 sm:px-6 h-[44px] rounded-full text-sm font-medium transition-colors">ออกจากระบบ</button>
             ) : (
               <>
-                <Link href="/register" className="text-[#650014] border border-[#650014] hover:bg-[#650014] hover:text-white px-6 h-[44px] flex items-center rounded-full text-sm font-medium transition-all">
+                <Link href="/register" className="hidden sm:flex text-[#650014] border border-[#650014] hover:bg-[#650014] hover:text-white px-6 h-[44px] items-center rounded-full text-sm font-medium transition-all">
                   สมัครสมาชิก
                 </Link>
-                <Link href="/login" className="bg-[#650014] hover:bg-[#7A001A] text-white px-6 h-[44px] flex items-center rounded-full text-sm font-medium transition-all">
+                <Link href="/login" className="bg-[#650014] hover:bg-[#7A001A] text-white px-4 sm:px-6 h-[44px] flex items-center rounded-full text-sm font-medium transition-all">
                   เข้าสู่ระบบ
                 </Link>
               </>
             )}
+            
+            {/* ✅ ปุ่ม Hamburger สำหรับจอมือถือ */}
+            <button 
+              onClick={() => setIsMenuOpen(!isMenuOpen)} 
+              className="lg:hidden p-2 text-[#6B7280] hover:text-[#650014] hover:bg-gray-50 rounded-full transition-colors focus:outline-none"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           </div>
+
+          {/* ✅ เมนู Dropdown สำหรับจอมือถือ (แสดงเมื่อกดปุ่ม Hamburger) */}
+          {isMenuOpen && (
+            <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white border border-[#E5E7EB] rounded-2xl p-4 shadow-lg flex flex-col gap-2 lg:hidden z-50">
+              <Link href="/" onClick={() => setIsMenuOpen(false)} className="bg-[#650014] text-white px-4 py-3 rounded-xl text-sm font-medium text-center">หน้าหลัก</Link>
+              <Link href="/projects" onClick={() => setIsMenuOpen(false)} className="text-[#6B7280] hover:text-[#650014] hover:bg-gray-50 px-4 py-3 rounded-xl text-sm font-medium text-center">โครงการ</Link>
+              <Link href="/reports" onClick={() => setIsMenuOpen(false)} className="text-[#6B7280] hover:text-[#650014] hover:bg-gray-50 px-4 py-3 rounded-xl text-sm font-medium text-center">รายงาน</Link>
+              <Link href="/users" onClick={() => setIsMenuOpen(false)} className="text-[#6B7280] hover:text-[#650014] hover:bg-gray-50 px-4 py-3 rounded-xl text-sm font-medium text-center">ผู้ใช้งาน</Link>
+              <Link href="/account" onClick={() => setIsMenuOpen(false)} className="text-[#6B7280] hover:text-[#650014] hover:bg-gray-50 px-4 py-3 rounded-xl text-sm font-medium text-center">บัญชี</Link>
+              
+              {/* แสดงปุ่มสมัครสมาชิกในเมนูมือถือด้วย (กรณีซ่อนจากแถบบนเพราะจอเล็กเกินไป) */}
+              {!isLoggedIn && (
+                <Link href="/register" onClick={() => setIsMenuOpen(false)} className="sm:hidden text-[#650014] border border-[#650014] px-4 py-3 rounded-xl text-sm font-medium text-center mt-2">
+                  สมัครสมาชิก
+                </Link>
+              )}
+            </div>
+          )}
         </div>
       </header>
 
